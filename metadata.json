@@ -1,0 +1,5 @@
+{
+  "name": "Zodiac AI Horoscope",
+  "description": "An AI-powered horoscope generator that provides personalized insights based on your zodiac sign. Get guidance for different areas of your life, tuned to the celestial energies affecting your sign.",
+  "requestFramePermissions": []
+}
