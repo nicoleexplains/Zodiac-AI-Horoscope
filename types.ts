@@ -1,6 +1,7 @@
 // Fix: Import React to use React.ReactNode
 import React from 'react';
-import type { Planet } from './types';
+
+// Fix: Removed circular self-import of `Planet` type which caused a conflict.
 
 export type ZodiacName = 'Aries' | 'Taurus' | 'Gemini' | 'Cancer' | 'Leo' | 'Virgo' | 'Libra' | 'Scorpio' | 'Sagittarius' | 'Capricorn' | 'Aquarius' | 'Pisces';
 

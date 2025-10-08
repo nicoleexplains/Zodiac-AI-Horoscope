@@ -148,7 +148,7 @@ const App: React.FC = () => {
                   disabled={isGenerating}
                   className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300 ease-in-out font-cinzel tracking-widest"
                 >
-                  {isGenerating ? 'Consulting the Stars...' : 'Generate Horoscope'}
+                  {isGenerating ? 'Consulting the Stars...' : horoscope ? "Get Today's Reading" : 'Generate Horoscope'}
                 </button>
               </div>
             </div>
