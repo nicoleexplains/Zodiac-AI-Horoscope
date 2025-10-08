@@ -1,8 +1,6 @@
-// Fix: Import Planet and PlanetName types to be used in new constants.
 import type { FocusArea, ZodiacSign, Planet, PlanetName } from './types';
 import React from 'react';
 
-// Fix: Replaced JSX with React.createElement to be valid in a .ts file.
 const HeartIcon = () => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement('path', { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4.318 6.318a4.5 4.5 0 016.364 0L12 7.5l1.318-1.182a4.5 4.5 0 116.364 6.364L12 21l-7.682-7.318a4.5 4.5 0 010-6.364z" }));
 const BriefcaseIcon = () => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement('path', { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" }));
 const SparklesIcon = () => React.createElement('svg', { xmlns: "http://www.w3.org/2000/svg", className: "h-6 w-6", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, React.createElement('path', { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.293 2.293a1 1 0 010 1.414L10 16l-4 4-4-4 5.293-5.293a1 1 0 011.414 0L13 13m0 0l2.293 2.293a1 1 0 001.414 0L21 12m-8 8l2.293-2.293a1 1 0 011.414 0L21 16m-8-8l-2.293-2.293a1 1 0 00-1.414 0L5 8m8 8l-2.293 2.293a1 1 0 01-1.414 0L5 16m8-8V5a1 1 0 00-1-1H4a1 1 0 00-1 1v4" }));
@@ -25,7 +23,6 @@ export const ZODIAC_SIGNS: ZodiacSign[] = [
 ];
 
 export const FOCUS_AREAS: FocusArea[] = [
-  // Fix: Use React.createElement to instantiate icon components.
   { name: 'Love', icon: React.createElement(HeartIcon) },
   { name: 'Career', icon: React.createElement(BriefcaseIcon) },
   { name: 'Wellness', icon: React.createElement(SparklesIcon) },
@@ -33,15 +30,14 @@ export const FOCUS_AREAS: FocusArea[] = [
   { name: 'Creativity', icon: React.createElement(LightBulbIcon) },
 ];
 
-// Fix: Add and export constants for planetary hour calculations.
 export const PLANETS: Record<PlanetName, Planet> = {
-  Sun: { name: 'Sun', symbol: '☉', color: 'text-yellow-400' },
-  Moon: { name: 'Moon', symbol: '☽', color: 'text-gray-300' },
-  Mars: { name: 'Mars', symbol: '♂', color: 'text-red-500' },
-  Mercury: { name: 'Mercury', symbol: '☿', color: 'text-indigo-400' },
-  Jupiter: { name: 'Jupiter', symbol: '♃', color: 'text-orange-500' },
-  Venus: { name: 'Venus', symbol: '♀', color: 'text-pink-400' },
-  Saturn: { name: 'Saturn', symbol: '♄', color: 'text-blue-400' },
+  Sun: { name: 'Sun', symbol: '☉', color: 'text-yellow-400', frequency: 126.22 },
+  Moon: { name: 'Moon', symbol: '☽', color: 'text-gray-300', frequency: 210.42 },
+  Mars: { name: 'Mars', symbol: '♂', color: 'text-red-500', frequency: 144.72 },
+  Mercury: { name: 'Mercury', symbol: '☿', color: 'text-indigo-400', frequency: 141.27 },
+  Jupiter: { name: 'Jupiter', symbol: '♃', color: 'text-orange-500', frequency: 183.58 },
+  Venus: { name: 'Venus', symbol: '♀', color: 'text-pink-400', frequency: 221.23 },
+  Saturn: { name: 'Saturn', symbol: '♄', color: 'text-blue-400', frequency: 147.85 },
 };
 
 export const CHALDEAN_ORDER: PlanetName[] = ['Saturn', 'Jupiter', 'Mars', 'Sun', 'Venus', 'Mercury', 'Moon'];
@@ -55,3 +51,5 @@ export const DAY_RULERS: PlanetName[] = [ // Corresponds to Date.getDay() where 
   'Venus',
   'Saturn',
 ];
+
+export const BINAURAL_BEAT_HZ = 4; // A theta wave frequency for relaxation

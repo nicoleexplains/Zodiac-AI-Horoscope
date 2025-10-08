@@ -1,8 +1,9 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { generateHoroscope } from './services/geminiService';
 import { getCurrentPlanetaryHour, getDayRuler } from './services/planetaryHourService';
+import { audioService } from './services/audioService';
 import type { FocusArea, ZodiacSign, PlanetaryHour, Planet } from './types';
-import { FOCUS_AREAS, ZODIAC_SIGNS } from './constants';
+import { FOCUS_AREAS, ZODIAC_SIGNS, BINAURAL_BEAT_HZ } from './constants';
 import ZodiacSelector from './components/ZodiacSelector';
 import FocusSelector from './components/FocusSelector';
 import HoroscopeDisplay from './components/HoroscopeDisplay';
@@ -16,15 +17,43 @@ const App: React.FC = () => {
   const [horoscope, setHoroscope] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
 
-  // New state for planetary hours
+  // Planetary hours state
   const [planetaryHour, setPlanetaryHour] = useState<PlanetaryHour | null>(null);
   const [dayRuler, setDayRuler] = useState<Planet | null>(null);
   const [dayName, setDayName] = useState<string>('');
   const [isLocationLoading, setIsLocationLoading] = useState<boolean>(true);
 
+  // Tone generator state
+  const [isPlayingTone, setIsPlayingTone] = useState<boolean>(false);
+  const [volume, setVolume] = useState<number>(0.2);
+
+  const planetForTone = planetaryHour?.ruler || dayRuler;
+
+  // Stop tone if the relevant planet changes
   useEffect(() => {
+    setIsPlayingTone(false);
+    audioService.stop();
+  }, [planetForTone?.name]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      audioService.stop();
+    };
+  }, []);
+
+  useEffect(() => {
+    const setDayInfo = () => {
+      const now = new Date();
+      const currentDayRuler = getDayRuler(now);
+      const currentDayName = now.toLocaleDateString('en-US', { weekday: 'long' });
+      setDayRuler(currentDayRuler);
+      setDayName(currentDayName);
+    };
+
     if (!navigator.geolocation) {
       setError("Geolocation is not supported by your browser.");
+      setDayInfo();
       setIsLocationLoading(false);
       return;
     }
@@ -34,18 +63,14 @@ const App: React.FC = () => {
         try {
           const { latitude, longitude } = position.coords;
           const now = new Date();
-          
           const currentHour = getCurrentPlanetaryHour(latitude, longitude, now);
-          const currentDayRuler = getDayRuler(now);
-          const currentDayName = now.toLocaleDateString('en-US', { weekday: 'long' });
-
           setPlanetaryHour(currentHour);
-          setDayRuler(currentDayRuler);
-          setDayName(currentDayName);
-        } catch (calcError: any) {
+        } catch (calcError: any)
+        {
           console.error(calcError);
           setError(calcError.message || "Could not calculate planetary hours for your location. You might be in a polar region.");
         } finally {
+          setDayInfo();
           setIsLocationLoading(false);
         }
       },
@@ -64,11 +89,12 @@ const App: React.FC = () => {
             setError("An unknown error occurred while fetching your location.");
             break;
         }
+        setDayInfo();
         setIsLocationLoading(false);
       },
       { timeout: 10000 }
     );
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, []);
 
   const handleGenerate = useCallback(async () => {
     if (!selectedZodiac || !selectedFocus) {
@@ -91,6 +117,21 @@ const App: React.FC = () => {
     }
   }, [selectedZodiac, selectedFocus]);
 
+  const handleTogglePlayTone = useCallback(() => {
+    if (isPlayingTone) {
+      audioService.stop();
+      setIsPlayingTone(false);
+    } else if (planetForTone) {
+      audioService.start(planetForTone.frequency, BINAURAL_BEAT_HZ, volume);
+      setIsPlayingTone(true);
+    }
+  }, [isPlayingTone, planetForTone, volume]);
+  
+  const handleVolumeChange = useCallback((newVolume: number) => {
+    setVolume(newVolume);
+    audioService.setVolume(newVolume);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#0f0c29] via-[#302b63] to-[#24243e] text-gray-200 p-4 sm:p-8 flex flex-col items-center">
       <div className="w-full max-w-4xl mx-auto">
@@ -109,23 +150,22 @@ const App: React.FC = () => {
           )}
 
           <div className="animate-fadeInUp space-y-8">
-            {/* Planetary Hour Display Section */}
             <div className="bg-black/20 p-6 rounded-2xl shadow-2xl backdrop-blur-sm border border-white/10">
                 <h2 className="text-3xl font-cinzel text-center mb-6 text-purple-300">Current Celestial Influence</h2>
                 {isLocationLoading && <Loader message="Determining your celestial position..." />}
-                {!isLocationLoading && planetaryHour && dayRuler && (
+                {!isLocationLoading && dayRuler && (
                     <PlanetDisplay
                         planetaryHour={planetaryHour}
                         dayRuler={dayRuler}
                         dayName={dayName}
+                        isPlaying={isPlayingTone}
+                        volume={volume}
+                        onTogglePlay={handleTogglePlayTone}
+                        onVolumeChange={handleVolumeChange}
                     />
-                )}
-                {!isLocationLoading && !planetaryHour && !error && (
-                     <p className="text-center text-gray-400">Planetary information is unavailable. Enable location access to see the current influence.</p>
                 )}
             </div>
 
-            {/* Horoscope Generation Section */}
             <div className="bg-black/20 p-6 rounded-2xl shadow-2xl backdrop-blur-sm border border-white/10">
               <h2 className="text-3xl font-cinzel text-center mb-6 text-purple-300">Seek Your Guidance</h2>
               <div className="space-y-8">
